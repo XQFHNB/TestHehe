@@ -17,8 +17,6 @@ import java.util.Vector;
 public class UDPCollection extends JFrame implements ActionListener {
 
 
-    public static final String FILE = "D:\\logger.txt";
-
     private JTextField sendMsg;//信息内容文本框
     private JTextArea receivedMsg;//接收消息显示区
     private JButton sendBtn;
@@ -30,27 +28,26 @@ public class UDPCollection extends JFrame implements ActionListener {
     private JFileChooser jfc;
     private byte[] buffer;
 
-    private Thread t;
-    private Thread t1;
 
-    private String titleString;
-    private int inPort;
-    private int outPort;
+
+
     private InetAddress group = null;
     private MulticastSocket socket = null;
-    //private static OnLinePeople onLinePeople;
+
+    private ProgressBar progressBar;
     private static ArrayList list = new ArrayList();
+    private Timer timer;
 
     public UDPCollection(Model model) {
         this.model = model;
         this.setVisible(true);
         this.setTitle(model.getTitleString());
         this.setSize(600, 450);
+        timer = new Timer(100, this);
         list.add(model.getTitleString());
         for (int i = 0; i < list.size(); i++) {
             System.out.println(list.get(i));
         }
-        //  onLinePeople = OnLinePeople.getOnLine();
         //   addOnlineName(model.getTitleString());
         container = this.getContentPane();
         jfc = new JFileChooser();
@@ -60,6 +57,7 @@ public class UDPCollection extends JFrame implements ActionListener {
 // 添加滑动面板，也就是中间的消息界面
         JScrollPane centerPanel = new JScrollPane();//新建滑动面板对象
         receivedMsg = new JTextArea();
+        receivedMsg.setEnabled(false);
         centerPanel.setViewportView(receivedMsg);//把文本编辑区放进滚动面板
         // JScrollPanel centerPanel=new JScrollPanel(receivedMsg)
         container.add(centerPanel, BorderLayout.CENTER);//把滚动面板放在窗口最中间
@@ -111,12 +109,11 @@ public class UDPCollection extends JFrame implements ActionListener {
         String[] list = null;
         headVector.add("用户");
         headVector.add("状态");
-        //    OnLinePeople onLinePeople = OnLinePeople.getOnLine();
         //ArrayList list = (ArrayList) onLinePeople.getNameOnline();
 
         BufferedReader br = null;
         try {
-            br = new BufferedReader(new FileReader(UDPCollection.FILE));
+            br = new BufferedReader(new FileReader(Config.FILE));
             StringBuffer sb = new StringBuffer();
             String stringContent;
             while ((stringContent = br.readLine()) != null) {
@@ -177,11 +174,12 @@ public class UDPCollection extends JFrame implements ActionListener {
 
         if (button == sendBtn) {
 
-            buffer = ("a" + sendMsg.getText().trim()).getBytes();
-            if (buffer.length == 0) {
+            if (sendMsg.getText().trim().isEmpty()) {
                 JOptionPane.showMessageDialog(null, "发送消息不能为空", "提示", JOptionPane.CLOSED_OPTION);
                 return;
             }
+            buffer = ("a" + sendMsg.getText().trim()).getBytes();
+
             //构造数据包一直都在用这个方法，相对来说简单，把端口，大小什么的都说明了,
             //将buff.length()大小的数据buff发送到目的地址为destAddress的2012端口处
 
@@ -216,35 +214,46 @@ public class UDPCollection extends JFrame implements ActionListener {
                         sb.append(string);
                     }
 
-
-                    buffer = (sb.toString() + "end").getBytes();
-
-                    ProgressBar proBar = new ProgressBar();
-                    proBar.setValue(50);
-
-
-                    for (int i = 0; i < buffer.length; i++) {
-
-
-                        if (!proBar.isStop()) {
-
-                            System.out.println("proBar:" + proBar.isStop());
-                            //wait();
-                        }
-//                        } else {
-//                            notify();
-//                        }
-                        byte[] newBuffer = {buffer[i]};
-                        proBar.setValue((i / buffer.length) * 100);
-                        DatagramPacket dataPacket = new DatagramPacket(newBuffer, newBuffer.length, destAddress, model.getOutPort());
-                        //发送数据报
-                        try {
-                            sendSocket.send(dataPacket);
-                        } catch (IOException e) {
-                            System.out.println("数据报发送错误！");
-                        }
-
+//                    buffer = (sb.toString() + "end").getBytes();
+                    //先发送文件名
+                    byte[] fileNameBuff = ("\n" + fileName).getBytes();
+                    DatagramPacket dataPacket0 = new DatagramPacket(fileNameBuff, fileNameBuff.length, destAddress, model.getOutPort());
+                    //发送数据报
+                    try {
+                        sendSocket.send(dataPacket0);
+                    } catch (IOException e) {
+                        System.out.println("数据报发送错误！");
                     }
+
+
+                    //发送文件内容
+                    buffer = (sb.toString()).getBytes();
+
+                    progressBar = new ProgressBar();
+//                    progressBar.setValue(50);
+
+                    DatagramPacket dataPacket = new DatagramPacket(buffer, buffer.length, destAddress, model.getOutPort());
+                    //发送数据报
+                    try {
+                        sendSocket.send(dataPacket);
+                    } catch (IOException e) {
+                        System.out.println("数据报发送错误！");
+                    }
+
+
+//                    for (int i = 0; i < buffer.length; i++) {
+//
+//                        byte[] newBuffer = {buffer[i]};
+////                        progressBar.setValue((i / buffer.length) * 100);
+//                        DatagramPacket dataPacket = new DatagramPacket(newBuffer, newBuffer.length, destAddress, model.getOutPort());
+//                        //发送数据报
+//                        try {
+//                            sendSocket.send(dataPacket);
+//                        } catch (IOException e) {
+//                            System.out.println("数据报发送错误！");
+//                        }
+//
+//                    }
 
 
                     receivedMsg.append("我：发送文件完成\n");
@@ -271,6 +280,8 @@ public class UDPCollection extends JFrame implements ActionListener {
 
     class Mythread extends Thread {
         //子线程要干的事情,接收数据
+        String hehe = null;
+
         public void run() {
             DatagramPacket receivedPacket = null;
             DatagramSocket receivedSocket = null;
@@ -306,7 +317,7 @@ public class UDPCollection extends JFrame implements ActionListener {
 
                     //将获取到的数据转换为字符串
                     String message = new String(receivedPacket.getData(), 0, length);//查了一下API文档，里面的String真的有这个构造方法
-
+                    String filename = null;
                     if (message.charAt(0) == 'a') {
                         message = message.substring(1);
                         if (model.getTitleString().equals(UDPHostOne.HOSTNAME1)) {
@@ -316,20 +327,34 @@ public class UDPCollection extends JFrame implements ActionListener {
                             receivedMsg.append(UDPHostOne.HOSTNAME1 + ": " + message.toString() + "\n");
 
                         }
+                    } else if (message.charAt(0) == '\n') {
+                        filename = message;
+                        System.out.println("获取文件名：" + filename.substring(1));
+                        hehe = filename.substring(1);
                     } else {
                         sb.append(message);
-//                        receivedMsg.append("文件内容：" + message);
-//                        if (sb.toString().endsWith("end")) {
+                        receivedMsg.append("接收到文件：" + hehe);
+//                        receivedMsg.append("文件内容：" + message + "\n");
+//                        receivedMsg.append("sb:" + sb.toString() + "\n");
 
-                        receivedMsg.append("收到文件：" + sb.toString() + "\n");
-//                        }
+//                        new MyThread2("D:\\display\\" + filename.substring(1), sb.toString()).start();
+                        try {
+                            System.out.println("D:\\display\\" + hehe);
+                            RandomAccessFile fFile = new RandomAccessFile("D:\\display\\" + hehe, "rw");
+                            fFile.write(sb.toString().getBytes());
+                            fFile.close();
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
+
 
                 }
             }
         }
     }
-
 
     class Mythread1 extends Thread {
         @Override
@@ -343,7 +368,7 @@ public class UDPCollection extends JFrame implements ActionListener {
                     try {
                         socket.receive(packet);
                         String message = new String(packet.getData(), 0, packet.getLength());
-                        receivedMsg.append(model.getTitleString() + "收到：" + message.toString() + "\n");
+                        receivedMsg.append(model.getTitleString() + "系统消息：" + message.toString() + "\n");
                         System.out.println(message);
                     } catch (IOException e) {
                         e.printStackTrace();

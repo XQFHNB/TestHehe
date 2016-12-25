@@ -8,7 +8,7 @@ import java.io.*;
  * Created by XQF on 2016/12/20.
  */
 public class UDPHostOne {
-    public static final String HOSTNAME1 = "主机1";
+    public static final String HOSTNAME1 = "小牛";
 
     private String content;
     private String newContent;
@@ -17,7 +17,7 @@ public class UDPHostOne {
 
         UDPCollection collection = new UDPCollection(model);
         try {
-            BufferedReader br = new BufferedReader(new FileReader(UDPCollection.FILE));
+            BufferedReader br = new BufferedReader(new FileReader(Config.FILE));
             StringBuffer sb = new StringBuffer();
             String stringContent;
             while ((stringContent = br.readLine()) != null) {
@@ -27,7 +27,7 @@ public class UDPHostOne {
             content = sb.toString().trim();
             newContent = model.getTitleString() + "a";
             content = content + newContent;
-            PrintWriter pw = new PrintWriter(new FileWriter(UDPCollection.FILE));
+            PrintWriter pw = new PrintWriter(new FileWriter(Config.FILE));
             pw.write(content);
             pw.close();
 
@@ -42,7 +42,7 @@ public class UDPHostOne {
                 super.windowClosing(e);
 
                 try {
-                    BufferedReader br = new BufferedReader(new FileReader(UDPCollection.FILE));
+                    BufferedReader br = new BufferedReader(new FileReader(Config.FILE));
                     StringBuffer sb = new StringBuffer();
                     String stringContent;
                     while ((stringContent = br.readLine()) != null) {
@@ -50,8 +50,8 @@ public class UDPHostOne {
                     }
                     br.close();
                     content = sb.toString().trim();
-                    content = content.replace(HOSTNAME1+"a", "");
-                    PrintWriter pw = new PrintWriter(new FileWriter(UDPCollection.FILE));
+                    content = content.replace(HOSTNAME1 + "a", "");
+                    PrintWriter pw = new PrintWriter(new FileWriter(Config.FILE));
                     pw.write(content);
                     pw.close();
 

@@ -13,54 +13,54 @@ import java.net.MulticastSocket;
  */
 public class MulticastReceiver extends JFrame implements Runnable, ActionListener {
     private static final long serialVersionUID = -5923790809266120014L;
-    int port; // �鲥�Ķ˿�
-    InetAddress group = null; // �鲥������ַ.
-    MulticastSocket socket = null; // �ಥ�׽���.
-    JButton startButton; // ��ʼ���հ�ť
-    JButton stopButton; // ֹͣ���ܰ�ť
-    JButton clearButton; // ֹͣ���ܰ�ť
-    JTextArea currentMsg; // ��ǰ���յĹ㲥��Ϣ
-    JTextArea receivedMsg; // �Ѿ��յ��Ĺ㲥��Ϣ
-    Thread thread; // ����������Ϣ���߳�
-    boolean isStop = false; //ֹͣ���չ㲥��Ϣ��ʶ
+    int port;
+    InetAddress group = null;
+    MulticastSocket socket = null;
+    JButton startButton;
+    JButton stopButton;
+    JButton clearButton;
+    JTextArea currentMsg;
+    JTextArea receivedMsg;
+    Thread thread;
+    boolean isStop = false;
 
 
     public MulticastReceiver() {
-        setTitle("测试"); // ���ô��ڵı���
-        Container container = this.getContentPane(); // ��ǰ���ڵ���������
-        startButton = new JButton("开始"); // ������ʼ���հ�ť����
-        stopButton = new JButton("ֹͣ停止"); // ����ֹͣ���հ�ť����
-        clearButton = new JButton("清空"); // ����������Ϣ��ť����
-        stopButton.addActionListener(this); // ע�Ὺʼ���հ�ť�ļ�����
-        startButton.addActionListener(this); // ע��ֹͣ���հ�ť�ļ�����
-        clearButton.addActionListener(this); // ע��������Ϣ��ť�ļ�����
-        currentMsg = new JTextArea(3, 20); // ����һ��3��20�еĶ����ı���
-        currentMsg.setForeground(Color.red); // �����ı�������ɫΪ��ɫ
-        receivedMsg = new JTextArea(8, 20); // ����һ��8��20�еĶ����ı��򣬲�ʹ��Ĭ�ϵĺ�ɫ
-        container.setLayout(new BorderLayout()); // ���ô��������Ĳ���ΪBorderLayout
-        JSplitPane sp = new JSplitPane(JSplitPane.VERTICAL_SPLIT); // ����һ��ˮƽ�ָ���������
-        JScrollPane currScrollPanel = new JScrollPane(); // ����һ����������
-        currScrollPanel.setViewportView(currentMsg); // �ڹ��������Ϸ���currentMsg����
-        JScrollPane recvScrollPanel = new JScrollPane(); // ����һ����������
-        recvScrollPanel.setViewportView(receivedMsg); // �ڹ��������Ϸ���receivedMsg����
-        currentMsg.setEditable(false); // ����currentMsg���ɱ༭
-        receivedMsg.setEditable(false); // ����receivedMsg���ɱ༭
-        sp.add(currScrollPanel); // �ڷ�������������currScrollPanel����
-        sp.add(recvScrollPanel); // �ڷ�������������recvScrollPanel����
-        container.add(sp, BorderLayout.CENTER); // ��sp�����ŵ����ڵ�������
-        JPanel bottomPanel = new JPanel(); // �����ײ�����
-        bottomPanel.add(startButton); // ����ʼ���հ�ť�����ײ�����
-        bottomPanel.add(stopButton); // ��ֹͣ���հ�ť�����ײ�����
-        bottomPanel.add(clearButton); // ��������Ϣ��ť�����ײ�����
-        container.add(bottomPanel, BorderLayout.SOUTH); // ���ײ��������봰�ڵײ���
-        setSize(500, 400); // ���ô��ڴ�С
-        setVisible(true); // ���ô��ڿ���
-        thread = new Thread(this); // �����̶߳���
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // ���ô����˳���ʽ
-        port = 2018; // �����鲥���ļ����˿�
+        setTitle("测试");
+        Container container = this.getContentPane();
+        startButton = new JButton("开始");
+        stopButton = new JButton("ֹͣ停止");
+        clearButton = new JButton("清空");
+        stopButton.addActionListener(this);
+        startButton.addActionListener(this);
+        clearButton.addActionListener(this);
+        currentMsg = new JTextArea(3, 20);
+        currentMsg.setForeground(Color.red);
+        receivedMsg = new JTextArea(8, 20);
+        container.setLayout(new BorderLayout());
+        JSplitPane sp = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+        JScrollPane currScrollPanel = new JScrollPane();
+        currScrollPanel.setViewportView(currentMsg);
+        JScrollPane recvScrollPanel = new JScrollPane();
+        recvScrollPanel.setViewportView(receivedMsg);
+        currentMsg.setEditable(false);
+        receivedMsg.setEditable(false);
+        sp.add(currScrollPanel);
+        sp.add(recvScrollPanel);
+        container.add(sp, BorderLayout.CENTER);
+        JPanel bottomPanel = new JPanel();
+        bottomPanel.add(startButton);
+        bottomPanel.add(stopButton);
+        bottomPanel.add(clearButton);
+        container.add(bottomPanel, BorderLayout.SOUTH);
+        setSize(500, 400);
+        setVisible(true);
+        thread = new Thread(this);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        port = 2018;
         try {
-            group = InetAddress.getByName("230.198.112.0"); // ���öಥ���ĵ�ַΪ230.198.112.0
-            socket = new MulticastSocket(port); // �����ಥ�׽��֣���port�˿ڽ����鲥
+            group = InetAddress.getByName("230.198.112.0");
+            socket = new MulticastSocket(port);
 
             socket.joinGroup(group);
         } catch (Exception e) {
@@ -69,37 +69,37 @@ public class MulticastReceiver extends JFrame implements Runnable, ActionListene
 
 
     public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == startButton) { // ������ʼ��ť������
-            startButton.setEnabled(false); // ����ʼ��ť��Ϊ������״̬
-            stopButton.setEnabled(true); // ��ֹͣ��ťΪ����״̬
-            if (!(thread.isAlive())) { // �����߳�����������ֹͣ���հ�ť������
-                thread = new Thread(this); // ���´����̶߳���
+        if (e.getSource() == startButton) {
+            startButton.setEnabled(false);
+            stopButton.setEnabled(true);
+            if (!(thread.isAlive())) {
+                thread = new Thread(this);
             }
             try {
-                thread.start(); // �����߳�
-                isStop = false; // ��ֹͣ���ձ�־��Ϊ��
+                thread.start();
+                isStop = false;
             } catch (Exception ee) {
             }
         }
-        if (e.getSource() == stopButton) { // ����ֹͣ��ť������
-            startButton.setEnabled(true); // ����ʼ��ť��Ϊ����״̬
-            stopButton.setEnabled(false); // ��ֹͣ��ťΪ������״̬
-            isStop = true; // ��ֹͣ���ձ�־��Ϊ��
+        if (e.getSource() == stopButton) {
+            startButton.setEnabled(true);
+            stopButton.setEnabled(false);
+            isStop = true;
         }
-        if (e.getSource() == clearButton) { // ����ֹͣ��ť������
-            receivedMsg.setText(""); // ��receivedMsg����������
-        }
+        if (e.getSource() == clearButton) {
+            receivedMsg.setText("");
 
+        }
     }
 
 
     public void run() {
         while (true) {
-            byte buff[] = new byte[8192]; // �������Է��Ͷ˵�����
-            DatagramPacket packet = null; // �������ݱ�����
-            packet = new DatagramPacket(buff, buff.length, group, port); // ׼�����ݰ���
+            byte buff[] = new byte[8192];
+            DatagramPacket packet = null;
+            packet = new DatagramPacket(buff, buff.length, group, port);
             try {
-                socket.receive(packet); // �������ݰ�
+                socket.receive(packet);
                 String message = new String(packet.getData(), 0, packet
                         .getLength());
                 currentMsg.setText("广播消息" + message);

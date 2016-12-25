@@ -16,29 +16,17 @@ import java.util.logging.Logger;
  * Created by XQF on 2016/12/14.
  */
 
-class MyTimerTask extends TimerTask {
-    DatagramSocket sendSocket = null;
 
-    public MyTimerTask() {
-        try {
-            sendSocket = new DatagramSocket();
-        } catch (SocketException e) {
-            e.printStackTrace();
-        }
-    }
-
-
-    @Override
-    public void run() {
-
-    }
-}
 
 public class ProgressBar implements ActionListener, ChangeListener {
 
     JFrame frame = null;
 
     JProgressBar progressbar;
+
+    public JLabel getLabel() {
+        return label;
+    }
 
     JLabel label;
 
@@ -67,7 +55,7 @@ public class ProgressBar implements ActionListener, ChangeListener {
     public ProgressBar() {
 
         this.isStop = true;
-        frame = new JFrame("进度条简单示例");
+        frame = new JFrame("耐心等候。。。。。。");
 
         frame.setBounds(100, 100, 400, 130);
 
@@ -116,8 +104,8 @@ public class ProgressBar implements ActionListener, ChangeListener {
         panel.add(b);
         panel.add(c);
 
+
         timer = new Timer(1000, this);
-//        timer=new Timer();
 
 
         contentPanel.add(panel, BorderLayout.NORTH);
@@ -138,7 +126,6 @@ public class ProgressBar implements ActionListener, ChangeListener {
         if (e.getSource() == b) {
 
             timer.start();
-            isStop = false;
 
 
         }
@@ -149,13 +136,12 @@ public class ProgressBar implements ActionListener, ChangeListener {
 
         if (e.getSource() == timer) {
 
-//            int value = progressbar.getValue();
-            if (value < 100)
+            int value = progressbar.getValue();
+            if (value < 100) {
 
-//                progressbar.setValue(value += 5);
+                progressbar.setValue(value += 5);
                 progressbar.setValue(value);
-
-            else {
+            } else {
 
                 timer.stop();
 
@@ -200,7 +186,6 @@ public class ProgressBar implements ActionListener, ChangeListener {
             e.printStackTrace();
 
         }
-
         new ProgressBar();
 
     }

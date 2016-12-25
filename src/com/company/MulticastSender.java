@@ -83,21 +83,19 @@ public class MulticastSender extends JFrame implements ActionListener {
             new MulticastSender();
         }
         if (e.getSource() == sendBtn) {
-            while (true) {
-                try {
-                    DatagramPacket packet = null;
 
-                    byte buff[] = sendMsg.getText().trim().getBytes();
-                    textArea.append(sendMsg.getText().trim() + "\n");
-                    packet = new DatagramPacket(buff, buff.length, group, port);
-                    //   System.out.println(new String(buff));
-                    //   multiSocket.send(packet);
-                    sendMsg.setText("");
-                    //  sleep(2000);
+            try {
 
-                } catch (Exception e1) {
-                    System.out.println("Error: " + e1);
-                }
+                byte buff[] = sendMsg.getText().trim().getBytes();
+                textArea.append("系统消息：" + sendMsg.getText().trim() + "\n");
+                DatagramPacket packet = new DatagramPacket(buff, buff.length, group, port);
+                //   System.out.println(new String(buff));
+                multiSocket.send(packet);
+                sendMsg.setText("");
+                //  sleep(2000);
+
+            } catch (Exception e1) {
+                System.out.println("Error: " + e1);
             }
         }
     }
@@ -105,6 +103,4 @@ public class MulticastSender extends JFrame implements ActionListener {
     public static void main(String args[]) {
         new MulticastSender();
     }
-
-
 }
